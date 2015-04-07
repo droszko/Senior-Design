@@ -1,0 +1,37 @@
+<data>
+	<temp_c>6.2</temp_c>
+	<temp_f>43.2</temp_f>
+	<time_start>20</time_start>
+	<time_stop>24</time_stop>
+	<solenoids>1</solenoids>
+	<wind_mph>16.0</wind_mph>
+	<zipcode>00000</zipcode>
+	<day>
+		<period>0</period>
+		<condition>Chance of Rain</condition>
+		<pop>70</pop>
+		<rain>0.07</rain>
+		<snow>0.0</snow>
+	</day>
+	<day>
+		<period>1</period>
+		<condition>Chance of Rain</condition>
+		<pop>60</pop>
+		<rain>0.22</rain>
+		<snow>0.0</snow>
+	</day>
+	<day>
+		<period>2</period>
+		<condition>Overcast</condition>
+		<pop>20</pop>
+		<rain>0.06</rain>
+		<snow>0.0</snow>
+	</day>
+	<day>
+		<period>3</period>
+		<condition>Chance of Rain</condition>
+		<pop>60</pop>
+		<rain>0.26</rain>
+		<snow>0.0</snow>
+	</day>	
+</data>
