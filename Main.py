@@ -80,19 +80,22 @@ def wunderground(zipcode):
 	temperature_c = conditions_root.find("./current_observation/temp_c").text	
 	weather = conditions_root.find("./current_observation/weather").text
 	wind_mph = conditions_root.find("./current_observation/wind_mph").text
-
 	return
+	
+def savedata(variable):
+	xmlfile_tree = ET.parse("Data.xml")
+	xmlfile_root = xmlfile_tree.getroot()
+	
+#	mylist = ["123", "345", "567", "789"]
+#	for value in xmlfile_root.iter("condition"):
+#		value.text = mylist[0]
+#		mylist.pop(0)
+	
+	xmlfile_tree = ET.ElementTree(xmlfile_root)
+	xmlfile_tree.write("Data.xml")
+	
+	return
+	
 	
 if __name__ == '__main__':
 	main()
-
-#   Gave back the temperature, FUCK YES!!!!!!! SAVE THIS CODE
-#	From my understanding, conditions_root is a list, therefore it 
-# 	must be placed into a for loop for stuff to come out right
-# 	for temp in conditions_root.findall('current_observation'):
-# 		temper = float(temp.find('temp_f').text)
-# 		print temper
-
-#	Found this code second, but the main issue was that findall command
-#	returned a list, therefore you could not use .find or .text on it
-#	temperature_f = conditions_root.find("./current_observation/temp_f").text
