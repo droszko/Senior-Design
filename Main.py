@@ -3,26 +3,23 @@
 
 import urllib2
 import xml.etree.ElementTree as ET
-from xml.dom import minidom
 
 # The following are global variables which are set to values that 
 # are unrealistic for weather data. This allows the program to see if
 # something is not correctly being stored.
-temperature_f = 9999.99
-temperature_c = 9999.99 
-zipcode = 00000	
-weather = "nothing"
+temp_c = 9999.99
+temp_f = 9999.99 
+weather = "unknown"
 wind_mph = 999
+zipcode = 11790	
 #Lists are in this order: Today, Tomorrow, Day After Tomorrow, Another Day After
-amount_of_rain = [999,999,999,999]
-amount_of_snow = [999,999,999,999]
-chance_of_rain = [999,999,999,999]
-condition_forecast = ["NA", "NA", "NA", "NA"]
+amt_rain = [999,999,999,999]
+amt_snow = [999,999,999,999]
+conditions = ["NA", "NA", "NA", "NA"]
+rain_pct = [999,999,999,999]
 
 def main():
-#	zipcode = 11790
-	datafile()
-#	wunderground(zipcode)
+	wunderground()
 	return 0
 	
 def datafile():
@@ -41,7 +38,7 @@ def datafile():
 #	program to obtain weather data from the wunderground api. The
 #	string that is passed into this function will be the zipcode that
 #	is provided by the user.
-def wunderground(zipcode):
+def wunderground():
 #	The zipcode passed into this function is now added into our api url.	
 	url_wunderground = 'http://api.wunderground.com/api/472b20b3716e0a0b/conditions/forecast/q/%s.xml' %zipcode
 	
@@ -62,40 +59,71 @@ def wunderground(zipcode):
  	conditions_file.close()
  	conditions_root = ET.fromstring(conditions_data)
  	
- 	global amount_of_rain, amount_of_snow, chance_of_rain
+ 	global amt_rain, amt_snow, conditions, rain_pct
 	for forecastday in conditions_root.findall("./forecast/simpleforecast/forecastdays/forecastday"):
-		amount_of_rain.pop(0)
-		amount_of_rain.append(forecastday.find("qpf_allday/in").text)
-		amount_of_snow.pop(0)
-		amount_of_snow.append(forecastday.find("snow_allday/in").text)
-		chance_of_rain.pop(0)
-		chance_of_rain.append(forecastday.find("pop").text)
-		condition_forecast.pop(0)
-		condition_forecast.append(forecastday.find("conditions").text)
+		amt_rain.pop(0)
+		amt_rain.append(forecastday.find("qpf_allday/in").text)
+		amt_snow.pop(0)
+		amt_snow.append(forecastday.find("snow_allday/in").text)
+		conditions.pop(0)
+		conditions.append(forecastday.find("conditions").text)
+		rain_pct.pop(0)
+		rain_pct.append(forecastday.find("pop").text)
 	
 #	The global keyword is used in order to alter global variables, whose
 #	values will be replaced by those from the element tree.
-	global temperature_f, temperature_c, weather, wind_mph
-	temperature_f = conditions_root.find("./current_observation/temp_f").text
-	temperature_c = conditions_root.find("./current_observation/temp_c").text	
+	global temp_f, temp_c, weather, wind_mph
+	temp_f = conditions_root.find("./current_observation/temp_f").text
+	temp_c = conditions_root.find("./current_observation/temp_c").text	
 	weather = conditions_root.find("./current_observation/weather").text
 	wind_mph = conditions_root.find("./current_observation/wind_mph").text
+	
+	variable = "w"
+	savedata(variable)
+	
 	return
 	
 def savedata(variable):
 	xmlfile_tree = ET.parse("Data.xml")
 	xmlfile_root = xmlfile_tree.getroot()
 	
-#	mylist = ["123", "345", "567", "789"]
-#	for value in xmlfile_root.iter("condition"):
-#		value.text = mylist[0]
-#		mylist.pop(0)
+	if(variable == "u"):
+		print "u"
+	elif(variable == "w"):		
+		for condition in xmlfile_root.iter("condition"):
+			condition.text = conditions[0]
+			rotate = conditions[0]
+			conditions.pop(0)
+			conditions.append(rotate)
+		for rain in xmlfile_root.iter("rain"):
+			rain.text = amt_rain[0]
+			rotate = amt_rain[0]
+			amt_rain.pop(0)
+			amt_rain.append(rotate)
+		for snow in xmlfile_root.iter("snow"):
+			snow.text = amt_snow[0]
+			rotate = amt_snow[0]
+			amt_snow.pop(0)	
+			amt_snow.append(rotate)
+		for temp in xmlfile_root.iter("temp_c"):
+			temp.text = temp_c
+		for temp in xmlfile_root.iter("temp_f"):
+			temp.text = temp_f
+		for pop in xmlfile_root.iter("pop"):
+			pop.text = rain_pct[0]
+			rotate = rain_pct[0]
+			rain_pct.pop(0)	
+			rain_pct.append(rotate)
+		for wind in xmlfile_root.iter("wind_mph"):
+			wind.text = wind_mph
+		
+	else:
+		return
 	
 	xmlfile_tree = ET.ElementTree(xmlfile_root)
 	xmlfile_tree.write("Data.xml")
 	
 	return
-	
-	
+
 if __name__ == '__main__':
 	main()
