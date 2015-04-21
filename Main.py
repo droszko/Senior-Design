@@ -1,68 +1,115 @@
 #!/usr/bin/env python
 #!/usr/bin/python
 
-import urllib2
-import xml.etree.ElementTree as ET
 import datetime
 import RPi.GPIO as GPIO
+import urllib2
+import xml.etree.ElementTree as ET
 
 # The following are global variables which are set to values that 
 # are unrealistic for weather data. This allows the program to see if
 # something is not correctly being stored.
+first_run = "Yes"
 future = 1
-temp_c = 9999.99
-temp_f = 9999.99 
+temp_f = "NU" #w
 weather = "unknown"
-wind_mph = 999
-zipcode = 11790	
+wind_mph = "NU" #w
+zipcode = "NU"	
+wconditions = ["Drizzle", "Light Drizzle", "Heavy Drizzle", "Drizzle"]
+
 #Lists are in this order: Today, Tomorrow, Day After Tomorrow, Another Day After
-amt_rain = [999,999,999,999]
-amt_snow = [999,999,999,999]
-conditions = ["NA", "NA", "NA", "NA"]
-rain_pct = [999,999,999,999]
+amt_rain = ["NU","NU","NU","NU"] 
+amt_snow = ["NU","NU","NU","NU"] #w
+conditions = ["NA", "NA", "NA", "NA"] #w
+rain_pct = ["NU","NU","NU","NU"] #w
 
 def main():
-	GPIO.setmode(GPIO.BOARD)
-	GPIO.setwarnings(False)
-	GPIO.setup(5, GPIO.OUT)
-	GPIO.setup(7, GPIO.OUT)
+#	The getdata function is called in order to update certain global 
+#   variables.
+	getdata()
 	
-	if (getdata("run") == "0"):
-		GPIO.output(5, GPIO.LOW)
-		GPIO.output(7, GPIO.LOW)
-
+#	The following lines of code are used to configure the GPIO settings. 	
+#	GPIO.setwarnings(False)
+#	GPIO.setmode(GPIO.BOARD)
+#	GPIO.setup(5, GPIO.OUT)
+#	GPIO.setup(7, GPIO.OUT)
+	
+#	The if statement is used to see if this is the first time that the 
+#	code has ran. If so, it will enable the green LED and make sure the
+#	red LED is disabled.
+	if (first_run == "Yes"):
+#		GPIO.output(5, GPIO.LOW)
+#		GPIO.output(7, GPIO.LOW)
+		print "buffer"
+		
 	wunderground()
 	
+# 	Starting parameter check now
+	try:
+		float(temp_f)
+	except:
+#		GPIO.output(5, GPIO.HIGH)
+#		GPIO.output(7, GPIO.HIGH)
+		print "Floatation Device Error 1"
+		
+	try:
+		float(wind_mph)
+	except:
+#		GPIO.output(5, GPIO.HIGH)
+#		GPIO.output(7, GPIO.HIGH)
+		print "Floatation Device Error 2"
+	
+	if(temp_f < 33):
+		print "temp too low"
+		return
+	if(wind_mph < 20):
+		print wind_mph
+		print "wind too high"
+		return
+	
+	x = 0
+	while(x < 4):
+		if(amt_rain[x] >= 0.25):
+			loop = 4
+			break
+		if(amt_snow[x] >= 0.10):
+			loop = 4
+			break
+		if(rain_pct[x >= 60):
+			loop = 4
+			break
+		x = x + 1
+		
 #	d = datetime.datetime.now()
 #	print d.hour
-#	getdata("f")
-#	for x in range(0,future+1):
-#		if(
+
 	return
 	
-def getdata(westerfeld):
+def getdata():
 	xmlfile_tree = ET.parse("Data.xml")
 	xmlfile_root = xmlfile_tree.getroot()
-
-	if(westerfeld == "f"):
-		returnValue = int(xmlfile_root.find("./future").text)
-	elif(westerfeld == "run"):
-		returnValue = xmlfile_root.find("./firstrun").text
-		for runcheck in xmlfile_root.iter("firstrun"):
-			runcheck.text = "1"
-	else:
-		print "ERROR"
-		
+	
+	global first_run, future, zipcode
+	first_run = xmlfile_root.find("./firstrun").text
+	future = xmlfile_root.find("./update").text
+	zipcode = xmlfile_root.find("./zipcode").text
+	
 	xmlfile_tree = ET.ElementTree(xmlfile_root)
 	xmlfile_tree.write("Data.xml")	
-	return returnValue
+	return
 	
 #	The following function called wunderground will be used by the 
 #	program to obtain weather data from the wunderground api. The
 #	string that is passed into this function will be the zipcode that
 #	is provided by the user.
 def wunderground():
-#	The zipcode passed into this function is now added into our api url.	
+
+	if(zipcode == "NU"):
+#		GPIO.output(5, GPIO.LOW)
+#		GPIO.output(7, GPIO.HIGH)
+		print "buffer"
+
+#	The zipcode stored as a global variable is added into the url in order to request the correct weather data.
 	url_wunderground = 'http://api.wunderground.com/api/472b20b3716e0a0b/conditions/forecast/q/%s.xml' %zipcode
 	
 #	In the following code, the program will attempt to pull the xml data
@@ -71,19 +118,19 @@ def wunderground():
 		conditions_file = urllib2.urlopen(url_wunderground)
 	except urllib2.HTTPError, e:
 		print "This program has encountered an HTTPError: "
-		GPIO.output(5, GPIO.LOW)
-		GPIO.output(7, GPIO.HIGH)
+#		GPIO.output(5, GPIO.LOW)
+#		GPIO.output(7, GPIO.HIGH)
 		print e.code
 		return
 	except urllib2.URLError, e:
 		print "This program has encountered an URLError: "
-		GPIO.output(5, GPIO.LOW)
-		GPIO.output(7, GPIO.HIGH)
+#		GPIO.output(5, GPIO.LOW)
+#		GPIO.output(7, GPIO.HIGH)
 		print e.args
 		return
  	
- 	GPIO.output(5, GPIO.HIGH)
- 	GPIO.output(7, GPIO.LOW)
+# 	GPIO.output(5, GPIO.HIGH)
+# 	GPIO.output(7, GPIO.LOW)
  	
  	conditions_data = conditions_file.read()	
  	conditions_file.close()
@@ -102,9 +149,8 @@ def wunderground():
 	
 #	The global keyword is used in order to alter global variables, whose
 #	values will be replaced by those from the element tree.
-	global temp_f, temp_c, weather, wind_mph
+	global temp_f, weather, wind_mph
 	temp_f = conditions_root.find("./current_observation/temp_f").text
-	temp_c = conditions_root.find("./current_observation/temp_c").text	
 	weather = conditions_root.find("./current_observation/weather").text
 	wind_mph = conditions_root.find("./current_observation/wind_mph").text
 	
@@ -136,8 +182,6 @@ def savedata(variable):
 			rotate = amt_snow[0]
 			amt_snow.pop(0)	
 			amt_snow.append(rotate)
-		for temp in xmlfile_root.iter("temp_c"):
-			temp.text = temp_c
 		for temp in xmlfile_root.iter("temp_f"):
 			temp.text = temp_f
 		for pop in xmlfile_root.iter("pop"):
@@ -152,7 +196,15 @@ def savedata(variable):
 			
 	else:
 		return
-		
+	
+	for frun in xmlfile_root.iter("firstrun"):
+			frun.text = "No"
+			
+	print "Line 192"
+			
+	xmlfile_tree = ET.ElementTree(xmlfile_root)
+	xmlfile_tree.write("Data.xml")	
+	
 	return
 
 if __name__ == '__main__':

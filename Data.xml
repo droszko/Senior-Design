@@ -1,26 +1,26 @@
 <data>
-	<firstrun>1</firstrun>
+	<firstrun>No</firstrun>
 	<future>1</future>
-	<temp_c>13.8</temp_c>
-	<temp_f>56.8</temp_f>
+	<temp_c>14.3</temp_c>
+	<temp_f>57.2</temp_f>
 	<time_start>20</time_start>
 	<time_stop>24</time_stop>
 	<solenoids>1</solenoids>
 	<update>1</update>
-	<wind_mph>11.0</wind_mph>
-	<zipcode>00000</zipcode>
+	<wind_mph>20.0</wind_mph>
+	<zipcode>11790</zipcode>
 	<day>
 		<period>0</period>
-		<condition>Partly Cloudy</condition>
+		<condition>Clear</condition>
 		<pop>20</pop>
-		<rain>0.03</rain>
+		<rain>0.00</rain>
 		<snow>0.0</snow>
 	</day>
 	<day>
 		<period>1</period>
-		<condition>Chance of Rain</condition>
+		<condition>Rain</condition>
 		<pop>70</pop>
-		<rain>0.13</rain>
+		<rain>0.24</rain>
 		<snow>0.0</snow>
 	</day>
 	<day>
@@ -32,7 +32,7 @@
 	</day>
 	<day>
 		<period>3</period>
-		<condition>Partly Cloudy</condition>
+		<condition>Clear</condition>
 		<pop>0</pop>
 		<rain>0.00</rain>
 		<snow>0.0</snow>
