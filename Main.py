@@ -2,6 +2,7 @@
 #!/usr/bin/python
 
 import datetime
+import time
 import RPi.GPIO as GPIO
 import urllib2
 import xml.etree.ElementTree as ET
@@ -10,7 +11,8 @@ import xml.etree.ElementTree as ET
 # are unrealistic for weather data. This allows the program to see if
 # something is not correctly being stored.
 first_run = "Yes"
-future = 1
+future = "NU"
+internet = "Active"
 temp_f = "NU" #w
 weather = "unknown"
 wind_mph = "NU" #w
@@ -51,32 +53,40 @@ def main():
 #		GPIO.output(5, GPIO.HIGH)
 #		GPIO.output(7, GPIO.HIGH)
 		print "Floatation Device Error 1"
-		
+	
 	try:
 		float(wind_mph)
 	except:
 #		GPIO.output(5, GPIO.HIGH)
 #		GPIO.output(7, GPIO.HIGH)
 		print "Floatation Device Error 2"
+
+	try:
+		int(future)
+	except:
+#		GPIO.output(5, GPIO.HIGH)
+#		GPIO.output(7, GPIO.HIGH)
+		print "Floatation Device Error 3"
 	
-	if(temp_f < 33):
+	if(float(temp_f) <= 32.0):
 		print "temp too low"
 		return
-	if(wind_mph < 20):
-		print wind_mph
+		
+	if(float(wind_mph) >= 20.0):
 		print "wind too high"
 		return
 	
 	x = 0
-	while(x < 4):
-		if(amt_rain[x] >= 0.25):
-			loop = 4
+	y = int(future)
+	while(x <= y):
+		if(float(amt_rain[x]) >= 0.25):
+			y = 4
 			break
-		if(amt_snow[x] >= 0.10):
-			loop = 4
+		if(float(amt_snow[x]) >= 0.10):
+			y = 4
 			break
-		if(rain_pct[x >= 60):
-			loop = 4
+		if(float(rain_pct[x]) >= 70):
+			y = 4
 			break
 		x = x + 1
 		
@@ -91,7 +101,7 @@ def getdata():
 	
 	global first_run, future, zipcode
 	first_run = xmlfile_root.find("./firstrun").text
-	future = xmlfile_root.find("./update").text
+	future = xmlfile_root.find("./future").text
 	zipcode = xmlfile_root.find("./zipcode").text
 	
 	xmlfile_tree = ET.ElementTree(xmlfile_root)
@@ -114,19 +124,18 @@ def wunderground():
 	
 #	In the following code, the program will attempt to pull the xml data
 #	from the wunderground api. If it can't it will throw out an error.
+	global internet
  	try:
 		conditions_file = urllib2.urlopen(url_wunderground)
 	except urllib2.HTTPError, e:
-		print "This program has encountered an HTTPError: "
 #		GPIO.output(5, GPIO.LOW)
 #		GPIO.output(7, GPIO.HIGH)
-		print e.code
+		internet = "Inactive"
 		return
 	except urllib2.URLError, e:
-		print "This program has encountered an URLError: "
 #		GPIO.output(5, GPIO.LOW)
 #		GPIO.output(7, GPIO.HIGH)
-		print e.args
+		internet = "Inactive"
 		return
  	
 # 	GPIO.output(5, GPIO.HIGH)
@@ -196,11 +205,12 @@ def savedata(variable):
 			
 	else:
 		return
+		
+	print datetime.datetime.now()
+
 	
 	for frun in xmlfile_root.iter("firstrun"):
 			frun.text = "No"
-			
-	print "Line 192"
 			
 	xmlfile_tree = ET.ElementTree(xmlfile_root)
 	xmlfile_tree.write("Data.xml")	
