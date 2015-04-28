@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 #!/usr/bin/python
 
-import datetime
+from datetime import datetime
 import time
-import RPi.GPIO as GPIO
+		#import RPi.GPIO as GPIO
 import urllib2
 import xml.etree.ElementTree as ET
 
@@ -13,96 +13,165 @@ import xml.etree.ElementTree as ET
 first_run = "Yes"
 future = "NU"
 internet = "Active"
-temp_f = "NU" #w
-weather = "unknown"
-wind_mph = "NU" #w
+run_time = "NU"
+solenoids = "NU"
+temp_f = "NU"
+weather = "unknown" 
+wind_mph = "NU"
 zipcode = "NU"	
-wconditions = ["Drizzle", "Light Drizzle", "Heavy Drizzle", "Drizzle"]
+
+month = "NU"
+day = "NU"
+year="NU"
+
+lower_time = "NU"
+upper_time = "NU"
 
 #Lists are in this order: Today, Tomorrow, Day After Tomorrow, Another Day After
-amt_rain = ["NU","NU","NU","NU"] 
-amt_snow = ["NU","NU","NU","NU"] #w
-conditions = ["NA", "NA", "NA", "NA"] #w
-rain_pct = ["NU","NU","NU","NU"] #w
+amt_rain = ["NU","NU","NU","NU"]
+amt_snow = ["NU","NU","NU","NU"]
+conditions = ["NA", "NA", "NA", "NA"]
+rain_pct = ["NU","NU","NU","NU"]
 
 def main():
 #	The getdata function is called in order to update certain global 
-#   variables.
+#   variables from the stored xml file.
 	getdata()
 	
-#	The following lines of code are used to configure the GPIO settings. 	
-#	GPIO.setwarnings(False)
-#	GPIO.setmode(GPIO.BOARD)
-#	GPIO.setup(5, GPIO.OUT)
-#	GPIO.setup(7, GPIO.OUT)
+		#	The following lines of code are used to configure the GPIO settings. 	
+		#	GPIO.setwarnings(False)
+		#	GPIO.setmode(GPIO.BOARD)
+		#	GPIO.setup(5, GPIO.OUT)
+		#	GPIO.setup(7, GPIO.OUT)
 	
 #	The if statement is used to see if this is the first time that the 
 #	code has ran. If so, it will enable the green LED and make sure the
 #	red LED is disabled.
 	if (first_run == "Yes"):
-#		GPIO.output(5, GPIO.LOW)
-#		GPIO.output(7, GPIO.LOW)
+		#		GPIO.output(5, GPIO.LOW)
+		#		GPIO.output(7, GPIO.LOW)
 		print "buffer"
 		
+#	The wunderground function is called in order to retrieve weather
+# 	data from the wunderground api.
 	wunderground()
-	
+		
 # 	Starting parameter check now
 	try:
 		float(temp_f)
 	except:
-#		GPIO.output(5, GPIO.HIGH)
-#		GPIO.output(7, GPIO.HIGH)
+		#		GPIO.output(5, GPIO.HIGH)
+		#		GPIO.output(7, GPIO.HIGH)
 		print "Floatation Device Error 1"
 	
 	try:
 		float(wind_mph)
 	except:
-#		GPIO.output(5, GPIO.HIGH)
-#		GPIO.output(7, GPIO.HIGH)
+		#		GPIO.output(5, GPIO.HIGH)
+		#		GPIO.output(7, GPIO.HIGH)
 		print "Floatation Device Error 2"
 
 	try:
 		int(future)
 	except:
-#		GPIO.output(5, GPIO.HIGH)
-#		GPIO.output(7, GPIO.HIGH)
-		print "Floatation Device Error 3"
+		#		GPIO.output(5, GPIO.HIGH)
+		#		GPIO.output(7, GPIO.HIGH)
+		print "Integration Device Error 1"
+		
+	try:
+		int(lower_time)
+	except:
+		#		GPIO.output(5, GPIO.HIGH)
+		#		GPIO.output(7, GPIO.HIGH)
+		print "Integration Device Error 2"
+		
+	try:
+		int(run_time)
+	except:
+		#		GPIO.output(5, GPIO.HIGH)
+		#		GPIO.output(7, GPIO.HIGH)
+		print "Integration Device Error 3"
+
+	try:
+		int(solenoids)
+	except:
+		#		GPIO.output(5, GPIO.HIGH)
+		#		GPIO.output(7, GPIO.HIGH)
+		print "Integration Device Error 3"
+		
+	try:
+		int(upper_time)
+	except:
+		#		GPIO.output(5, GPIO.HIGH)
+		#		GPIO.output(7, GPIO.HIGH)
+		print "Integration Device Error 4"
 	
 	if(float(temp_f) <= 32.0):
 		print "temp too low"
 		return
 		
-	if(float(wind_mph) >= 20.0):
+	if(float(wind_mph) >= 25.0):
 		print "wind too high"
 		return
 	
 	x = 0
-	y = int(future)
-	while(x <= y):
+	while(x <= int(future)):
 		if(float(amt_rain[x]) >= 0.25):
-			y = 4
+			x = future
 			break
 		if(float(amt_snow[x]) >= 0.10):
-			y = 4
+			x = future
 			break
 		if(float(rain_pct[x]) >= 70):
-			y = 4
+			x = future
 			break
 		x = x + 1
 		
-#	d = datetime.datetime.now()
-#	print d.hour
-
+	time_now = datetime.now()
+	hour = time_now.hour
+	
+	if(int(lower_time) < int(upper_time)):
+		if(hour < int(lower_time) or hour > int(upper_time)):
+			return
+	elif(int(upper_time) < int(lower_time)):
+		if(hour > int(upper_time) and hour < int(lower_time)):
+			return
+	
+	x = 0
+	for x in range(0, int(solenoids)):
+		if(x == 0):
+			print "Launch 1"
+			#		GPIO.output(7, GPIO.HIGH)
+			time.sleep(int(run_time))
+			#		GPIO.output(7, GPIO.LOW)
+		elif(x == 1):
+			print "Launch 2"
+			#		GPIO.output(7, GPIO.HIGH)
+			time.sleep(int(run_time))
+			#		GPIO.output(7, GPIO.LOW)
+		x=x+1
+			
 	return
 	
 def getdata():
 	xmlfile_tree = ET.parse("Data.xml")
 	xmlfile_root = xmlfile_tree.getroot()
 	
-	global first_run, future, zipcode
+	global first_run, future, run_time, solenoids, zipcode
 	first_run = xmlfile_root.find("./firstrun").text
 	future = xmlfile_root.find("./future").text
+	run_time = xmlfile_root.find("./run_time").text
+	solenoids = xmlfile_root.find("./solenoids").text
 	zipcode = xmlfile_root.find("./zipcode").text
+	
+	global day, month, year
+	day = xmlfile_root.find("./day").text
+	month = xmlfile_root.find("./month").text
+	year = xmlfile_root.find("./year").text
+	
+	global lower_time, upper_time
+	lower_time = xmlfile_root.find("./time_start").text
+	upper_time = xmlfile_root.find("./time_stop").text
 	
 	xmlfile_tree = ET.ElementTree(xmlfile_root)
 	xmlfile_tree.write("Data.xml")	
@@ -115,8 +184,8 @@ def getdata():
 def wunderground():
 
 	if(zipcode == "NU"):
-#		GPIO.output(5, GPIO.LOW)
-#		GPIO.output(7, GPIO.HIGH)
+		#		GPIO.output(5, GPIO.LOW)
+		#		GPIO.output(7, GPIO.HIGH)
 		print "buffer"
 
 #	The zipcode stored as a global variable is added into the url in order to request the correct weather data.
@@ -128,18 +197,18 @@ def wunderground():
  	try:
 		conditions_file = urllib2.urlopen(url_wunderground)
 	except urllib2.HTTPError, e:
-#		GPIO.output(5, GPIO.LOW)
-#		GPIO.output(7, GPIO.HIGH)
+		#		GPIO.output(5, GPIO.LOW)
+		#		GPIO.output(7, GPIO.HIGH)
 		internet = "Inactive"
 		return
 	except urllib2.URLError, e:
-#		GPIO.output(5, GPIO.LOW)
-#		GPIO.output(7, GPIO.HIGH)
+		#		GPIO.output(5, GPIO.LOW)
+		#		GPIO.output(7, GPIO.HIGH)
 		internet = "Inactive"
 		return
  	
-# 	GPIO.output(5, GPIO.HIGH)
-# 	GPIO.output(7, GPIO.LOW)
+		# 	GPIO.output(5, GPIO.HIGH)
+		# 	GPIO.output(7, GPIO.LOW)
  	
  	conditions_data = conditions_file.read()	
  	conditions_file.close()
@@ -206,8 +275,17 @@ def savedata(variable):
 	else:
 		return
 		
-	print datetime.datetime.now()
-
+	date = datetime.now()
+	month = str(date.month)
+	day = str(date.day)
+	year = str(date.year)
+	
+	for datetimevalue in xmlfile_root.iter("month"):
+		datetimevalue.text = month
+	for datetimevalue in xmlfile_root.iter("day"):
+		datetimevalue.text = day
+	for datetimevalue in xmlfile_root.iter("year"):
+		datetimevalue.text = year
 	
 	for frun in xmlfile_root.iter("firstrun"):
 			frun.text = "No"
