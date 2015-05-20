@@ -1,0 +1,4 @@
+Intelligent Sprinkler System Water Usage Log
+==================================================================
+
+2015-05-15 03:29:29.381192: 10 Liters of water were used

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+		Intelligent Sprinkler System
+		</title>
+		<style>
+			body
+			{
+				font-family: arial, sans-serif, Georgia, "Times New Roman", Times, serif;
+				text-align:center;
+				background:#cceeff;
+			}
+			h1
+			{
+				text-shadow: 5px 5px 5px #aaaaaa;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Intelligent Sprinkler System Input Form</h1>
+		<form action="/SeniorDesign/action.py" method="POST">
+			Days Checked (1-3): <input type="text" size="20" name="days" value=""><br>
+			Start Hour (00-23): <input type="text" size="20" name="starthour" value=""><br>
+			End Hour (00-23): <input type="text" size="20" name="endhour" value=""><br>
+			Runtime (seconds): <input type="text" size="20" name="runtime" value=""><br>
+			Solenoids: <input type="text" size="20" name="solenoids" value=""><br>
+			Zipcode: <input type="text" size="20" name="zipcode" value=""><br>
+			<input type="reset" value="Reset">
+			<input type="submit" value="Submit">
+		</form>
+	</body>
+</html>

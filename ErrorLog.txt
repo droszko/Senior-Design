@@ -1,0 +1,8 @@
+Intelligent Sprinkler System Error Log
+==================================================================
+
+2015-05-15 01:02:03.131980: An URL error has occured during the weather underground api request
+2015-05-15 01:04:42.574355: An URL error has occured during the weather underground api request
+2015-05-15 01:20:04.824636: An URL error has occured during the weather underground api request
+2015-05-15 01:27:49.858915: An URL error has occured during the weather underground api request
+2015-05-15 01:59:40.426624: An URL error has occured during the weather underground api request
