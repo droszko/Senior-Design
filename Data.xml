@@ -1,21 +1,21 @@
 <data>
-	<day>28</day>
+	<day>7</day>
 	<firstrun>No</firstrun>
-	<future>3</future>
-	<month>4</month>
-	<run_time>5</run_time>
+	<future>2</future>
+	<month>5</month>
+	<run_time>30</run_time>
 	<temp_c>14.3</temp_c>
-	<temp_f>45.3</temp_f>
-	<time_start>1</time_start>
-	<time_stop>6</time_stop>
+	<temp_f>72.2</temp_f>
+	<time_start>12</time_start>
+	<time_stop>23</time_stop>
 	<solenoids>2</solenoids>
-	<update>1</update>
-	<wind_mph>22.0</wind_mph>
+	<update>lol</update>
+	<wind_mph>6.0</wind_mph>
 	<year>2015</year>
 	<zipcode>11790</zipcode>
 	<forecast>
 		<period>0</period>
-		<condition>Partly Cloudy</condition>
+		<condition>Clear</condition>
 		<pop>0</pop>
 		<rain>0.00</rain>
 		<snow>0.0</snow>
@@ -30,15 +30,15 @@
 	<forecast>
 		<period>2</period>
 		<condition>Partly Cloudy</condition>
-		<pop>20</pop>
+		<pop>10</pop>
 		<rain>0.00</rain>
 		<snow>0.0</snow>
 	</forecast>
 	<forecast>
 		<period>3</period>
-		<condition>Mostly Cloudy</condition>
-		<pop>20</pop>
-		<rain>0.01</rain>
+		<condition>Partly Cloudy</condition>
+		<pop>10</pop>
+		<rain>0.10</rain>
 		<snow>0.0</snow>
 	</forecast>	
 </data>
